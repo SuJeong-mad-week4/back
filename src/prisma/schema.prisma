@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Define your database models here
+model User {
+  id      Int      @id @default(autoincrement())
+  loginId       String   @unique
+  nickname String?
+  password String
+  profile  String?
+  pets     Pet[]
+  moods    Mood[]
+  chats    Chat[]
+  answers  Answer[]
+}
+
+model Pet {
+  id     Int     @id @default(autoincrement())
+  nickname String?
+  exp     Int
+  userId  Int
+  sort    String?
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model Mood {
+  id      Int      @id @default(autoincrement())
+  userId   Int
+  moodDate DateTime
+  mood     String
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model Chat {
+  id       Int      @id @default(autoincrement())
+  userId    Int
+  chatDate  DateTime
+  createdAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Question {
+  id  Int     @id @default(autoincrement())
+  body String
+  answers Answer[]
+}
+
+model Answer {
+  id        Int      @id @default(autoincrement())
+  questionId Int
+  userId     Int
+  body       String
+  question   Question @relation(fields: [questionId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+}
