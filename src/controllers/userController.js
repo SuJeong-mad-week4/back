@@ -1,13 +1,12 @@
-// src/controllers/itemController.js
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const bcrypt = require('bcrypt');
 
 // Create a new user
 async function loginUser(req, res) {
   console.log('loginUser');
   try {
     const { loginId, password } = req.body;
-
     console.log(req.body)
 
     // Check if the user already exists
@@ -15,23 +14,26 @@ async function loginUser(req, res) {
       where: { loginId: loginId },
     });
 
-    console.log(existingUser)
     if (!existingUser) {
       console.log('아이디가 존재하지 않습니다.')
       return res.status(400).json({ error: '아이디가 존재하지 않습니다.' });
     }
-
+    
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log(hashedPassword, existingUser.password)
     // check existing user's password is correct
-    if (existingUser.password !== password) {
-      console.log('비밀번호가 일치하지 않습니다.')
-      return res.status(400).json({ error: '비밀번호가 일치하지 않습니다.' });
+    if (!await bcrypt.compare(password, existingUser.password)) {
+      console.log('비밀번호 불일치');
+      return res.status(400).json({ error: '잘못된 비밀번호입니다.' });
     }
 
-    res.status(201).json(existingUser);
+    console.log(existingUser)
+    return res.status(201).json(existingUser);
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to create user' });
+    return res.status(500).json({ error: 'Failed to create user' });
   }
 }
 
@@ -40,6 +42,7 @@ async function signupUser(req, res) {
   console.log('signupUser')
   try {
     const { loginId, nickname, password } = req.body;
+    console.log(req.body)
 
     // Check if the user already exists
     const existingUser = await prisma.user.findUnique({
@@ -50,25 +53,26 @@ async function signupUser(req, res) {
       return res.status(400).json({ error: '이미 존재하는 유저입니다.' });
     }
 
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
     // Create the new user
     const newUser = await prisma.user.create({
       data: {
         loginId,
-        password,
+        password: hashedPassword,
         nickname,
       },
     });
 
-    res.status(201).json(newUser);
+    return res.status(201).json(newUser);
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to create user' });
+    return res.status(500).json({ error: 'Failed to create user' });
   }
 }
 
 async function checkId(req, res) {
-  console.log('checkId')
   try {
     const { loginId } = req.body;
 
@@ -81,11 +85,11 @@ async function checkId(req, res) {
       return res.status(400).json({ isDuplicated: true });
     }
 
-    res.status(201).json({ isDuplicated: false });
+    return res.status(201).json({ isDuplicated: false });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to create user' });
+    return res.status(500).json({ error: 'Failed to create user' });
   }
 }
 
@@ -114,11 +118,11 @@ async function editUser(req, res) {
       },
     });
 
-    res.status(201).json(newUser);
+    return res.status(201).json(newUser);
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to create user' });
+    return res.status(500).json({ error: 'Failed to create user' });
   }
 }
 
