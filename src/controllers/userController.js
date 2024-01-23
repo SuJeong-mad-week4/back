@@ -29,7 +29,13 @@ async function loginUser(req, res) {
     }
 
     console.log(existingUser)
-    return res.status(201).json(existingUser);
+    return res.status(201).json({
+      id: existingUser.id,
+      loginId: existingUser.loginId,
+      nickname: existingUser.nickname,
+      profile: existingUser.profile,
+      currentPet: existingUser.currentPet,
+    });
 
   } catch (error) {
     console.error(error);
@@ -61,6 +67,7 @@ async function signupUser(req, res) {
         loginId,
         password: hashedPassword,
         nickname,
+        currentPet: null,
       },
     });
 

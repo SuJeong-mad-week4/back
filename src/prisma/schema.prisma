@@ -14,9 +14,9 @@ model User {
   nickname String?
   password String
   profile  String?
+  currentPet Int?
   pets     Pet[]
   moods    Mood[]
-  chats    Chat[]
   answers  Answer[]
 }
 
@@ -25,7 +25,7 @@ model Pet {
   nickname String?
   exp     Int
   userId  Int
-  sort    String?
+  type    String?
   user    User    @relation(fields: [userId], references: [id])
 }
 
@@ -34,15 +34,8 @@ model Mood {
   userId   Int
   moodDate DateTime
   mood     String
+  content  String
   user     User     @relation(fields: [userId], references: [id])
-}
-
-model Chat {
-  id       Int      @id @default(autoincrement())
-  userId    Int
-  chatDate  DateTime
-  createdAt DateTime
-  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Question {

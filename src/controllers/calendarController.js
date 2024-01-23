@@ -27,6 +27,73 @@ async function getUserCalendar(req, res) {
     return res.status(500).json({ error: 'Failed to get user calendar' });
   }
 }
+
+async function createCalendar(req,res){
+  console.log("createCalendar")
+
+  const { userId, moodDate, mood, content } = req.body;
+  try {
+    const newMood = await prisma.mood.create({
+      data: {
+        userId: userId,
+        moodDate: moodDate,
+        mood: mood,
+        content: content,
+      },
+    });
+    return res.status(201).json(newMood);
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ error: 'Failed to create mood' });
+  }
+}
+
+async function getCalendar(req,res){
+  console.log("getCalendar")
+
+  const userId = req.query.userId;
+  const moodDate = req.query.moodDate;
+
+  try {
+    const Mood = await prisma.mood.findUnique({
+      where: {
+        userId: userId,
+        moodDate: moodDate,
+      },
+    });
+    return res.status(201).json(Mood);
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ error: 'Failed to create mood' });
+  }
+}
+
+async function deleteCalendar(req,res){
+  console.log("deleteCalendar")
+
+  const userId = req.query.userId;
+  const moodDate = req.query.moodDate;
+
+  try {
+    const Mood = await prisma.mood.update({
+      where: {
+        userId: userId,
+        moodDate: moodDate,
+      },
+      data: {
+        content: null,
+      },
+    });
+    return res.status(201).json(Mood);
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ error: 'Failed to create mood' });
+  }
+}
+
 module.exports = {
-  getUserCalendar
+  getUserCalendar,
+  createCalendar,
+  getCalendar,
+  deleteCalendar,
 };
