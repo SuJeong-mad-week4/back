@@ -17,7 +17,7 @@ model User {
   currentPet Int?
   pets     Pet[]
   moods    Mood[]
-  answers  Answer[]
+  todays  Today[]
 }
 
 model Pet {
@@ -32,23 +32,17 @@ model Pet {
 model Mood {
   id      Int      @id @default(autoincrement())
   userId   Int
-  moodDate DateTime
+  moodDate String
   mood     String
-  content  String
+  content  String?
   user     User     @relation(fields: [userId], references: [id])
 }
 
-model Question {
-  id  Int     @id @default(autoincrement())
-  body String
-  answers Answer[]
-}
-
-model Answer {
+model Today {
   id        Int      @id @default(autoincrement())
-  questionId Int
   userId     Int
-  body       String
-  question   Question @relation(fields: [questionId], references: [id])
+  question  String
+  todayDate String
+  answer       String
   user       User     @relation(fields: [userId], references: [id])
 }

@@ -79,27 +79,6 @@ async function signupUser(req, res) {
   }
 }
 
-async function checkId(req, res) {
-  try {
-    const { loginId } = req.body;
-
-    // Check if the user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { loginId },
-    });
-
-    if (existingUser) {
-      return res.status(400).json({ isDuplicated: true });
-    }
-
-    return res.status(201).json({ isDuplicated: false });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Failed to create user' });
-  }
-}
-
 // edit user
 async function editUser(req, res) {
   console.log('editUser')
